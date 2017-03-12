@@ -21,17 +21,23 @@ import java.util.Map;
  * @author mv
  */
 public abstract class Modem {
-
+        
     String cookie = null;
-    
+        
+    public enum wifiPassType {
+        NONE,
+        WEP,
+        WPA_AES,
+        WPA2_TKIP,
+    }
     
     public abstract boolean login(String user, String pass);
-    public abstract boolean setWifi(String name, String pass);
+    public abstract boolean setWifi(String ssid, String wifiPass, boolean enable, wifiPassType passType);
+
     
-    
-    public String request(String url, LinkedHashMap<String, String> params, boolean isPost, 
+    public String request(String url, LinkedHashMap<String, String> params, boolean isPost,
             HashMap<String, String> prop)throws MalformedURLException, IOException {
-        
+
         if(!isPost && params!=null)
             url = url+"?"+getQuery(params);
         URL obj = new URL(url);
@@ -39,7 +45,7 @@ public abstract class Modem {
         con.setRequestProperty("Accept", "application/json");
         con.setRequestProperty("Accept-Language", "fa,en;q=0.5");
         con.setRequestProperty("Accept-Charset", "UTF-8");
-        
+
         if(prop!=null){
             prop.entrySet().stream().forEach((entrySet) -> {
                 con.setRequestProperty(
@@ -48,11 +54,11 @@ public abstract class Modem {
                 );
             });
         }
-        
+
         if(cookie!=null){
             con.setRequestProperty("Cookie", cookie);
         }
-        
+
         if(isPost && params!=null){
             con.setRequestMethod("POST");
             con.setDoOutput(true);
@@ -71,11 +77,14 @@ public abstract class Modem {
         StringBuilder response = new StringBuilder();
         if(responseCode==200){
             String temp = con.getHeaderField("Set-Cookie");
-            if(temp!=null)
+            if(temp!=null){
                 this.cookie = temp;
+                System.out.println(this.cookie);
+            }
+            System.out.println("no cookie set");
             try (BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()))) {
                 String inputLine;
-                
+
                 while ((inputLine = in.readLine()) != null ) {
                     //            Funcs.log("netHandler.sendPostIN:", ""+inputLine);
                     //            x = inputLine.indexOf("<!DOCTYPE html>");
@@ -85,13 +94,13 @@ public abstract class Modem {
                     response.append(inputLine);
                 }
             }
-            return response.toString(); 
+            return response.toString();
         }else
             return null;
 
         
     }
-    
+
     private String getQuery(LinkedHashMap<String, String> params) {
         StringBuilder result = new StringBuilder();
         boolean first = true;

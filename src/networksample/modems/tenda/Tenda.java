@@ -13,7 +13,8 @@ import static util.Md5.md5;
  *
  * @author mv
  */
-public class Tenda extends Modem{
+public class Tenda extends Modem {
+
     String login = "http://192.168.1.1/";
 //    String login = "http://127.0.0.1:8089/";
 
@@ -23,42 +24,42 @@ public class Tenda extends Modem{
         params.put("username", md5(user));
         params.put("password", md5(pass));
         params.put("sessionKey", "0.1");
-        try{
-            String ans = request(login+"login.cgi", params, true, null);
+        try {
+            String ans = request(login + "login.cgi", params, true, null);
             System.out.println(ans);
-            
+
             return ans.contains("index");
-        }catch(Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return false;
     }
 
     @Override
-    public boolean setWifi(String name, String pass) {
-        LinkedHashMap<String,String> map = new LinkedHashMap<>();
-        map.put("action","add");
-        map.put("linkType","DSL");
-        map.put("pvcEn","0");
-        map.put("country_area","IR|ITC");
-        map.put("VPI","0");
-        map.put("VCI","35");
-        map.put("conType","PPPoE");
-        map.put("pppUserName","add");
-        map.put("pppPassword","02166908235");
-        map.put("wirelessEnable","1");
-        map.put("ssid", name);
-        map.put("wlWpaPsk", pass);
+    public boolean setWifi(String ssid, String wifiPass, boolean enable, wifiPassType passType) {
+        LinkedHashMap<String, String> map = new LinkedHashMap<>();
+        map.put("action", "add");
+        map.put("linkType", "DSL");
+        map.put("pvcEn", "0");
+        map.put("country_area", "IR|ITC");
+        map.put("VPI", "0");
+        map.put("VCI", "35");
+        map.put("conType", "PPPoE");
+        map.put("pppUserName", "add");
+        map.put("pppPassword", "02166908235");
+        map.put("wirelessEnable", "1");
+        map.put("ssid", ssid);
+        map.put("wlWpaPsk", wifiPass);
 //                wlWpaPsk=22m%40sh%40d52&
-        try{
-            String ans = request(login+"quicksetup.cmd", map, false, null);
+        try {
+            String ans = request(login + "quicksetup.cmd", map, false, null);
             System.out.println(ans);
-            
+
             return ans.contains("index");
-        }catch(Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return false;
     }
-    
+
 }
