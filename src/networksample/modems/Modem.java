@@ -21,32 +21,50 @@ import java.util.Map;
  * @author mv
  */
 public abstract class Modem {
-        
+
     String cookie = null;
-        
+
     public enum wifiPassType {
         NONE,
         WEP,
         WPA_AES,
         WPA2_TKIP,
     }
-    
+
+    public class wifiInfo {
+
+        public String ssid;
+        public String pass;
+        public boolean wifiDisabled;
+        public wifiPassType type;
+
+        public wifiInfo(String ssid, String pass, boolean wifiDisabled, wifiPassType type) {
+            this.ssid = ssid;
+            this.pass = pass;
+            this.wifiDisabled = wifiDisabled;
+            this.type = type;
+        }
+    }
+
     public abstract boolean login(String user, String pass);
+
     public abstract boolean setWifi(String ssid, String wifiPass, boolean enable, wifiPassType passType);
 
-    
-    public String request(String url, LinkedHashMap<String, String> params, boolean isPost,
-            HashMap<String, String> prop)throws MalformedURLException, IOException {
+    public abstract wifiInfo getWifi();
 
-        if(!isPost && params!=null)
-            url = url+"?"+getQuery(params);
+    public String request(String url, LinkedHashMap<String, String> params, boolean isPost,
+            HashMap<String, String> prop) throws MalformedURLException, IOException {
+
+        if (!isPost && params != null) {
+            url = url + "?" + getQuery(params);
+        }
         URL obj = new URL(url);
         HttpURLConnection con = (HttpURLConnection) obj.openConnection();
         con.setRequestProperty("Accept", "application/json");
         con.setRequestProperty("Accept-Language", "fa,en;q=0.5");
         con.setRequestProperty("Accept-Charset", "UTF-8");
 
-        if(prop!=null){
+        if (prop != null) {
             prop.entrySet().stream().forEach((entrySet) -> {
                 con.setRequestProperty(
                         entrySet.getKey(),
@@ -55,11 +73,11 @@ public abstract class Modem {
             });
         }
 
-        if(cookie!=null){
+        if (cookie != null) {
             con.setRequestProperty("Cookie", cookie);
         }
 
-        if(isPost && params!=null){
+        if (isPost && params != null) {
             con.setRequestMethod("POST");
             con.setDoOutput(true);
             try (DataOutputStream wr = new DataOutputStream(con.getOutputStream())) {
@@ -67,25 +85,23 @@ public abstract class Modem {
                 wr.flush();
             }
         }
-        int responseCode=200;
+        int responseCode = 200;
         try {
             responseCode = con.getResponseCode();
         } catch (Exception e) {
             e.printStackTrace();
         }
-        System.out.println("responseCode: "+responseCode);
+        System.out.println("responseCode: " + responseCode);
         StringBuilder response = new StringBuilder();
-        if(responseCode==200){
+        if (responseCode == 200) {
             String temp = con.getHeaderField("Set-Cookie");
-            if(temp!=null){
+            if (temp != null) {
                 this.cookie = temp;
-                System.out.println(this.cookie);
             }
-            System.out.println("no cookie set");
             try (BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()))) {
                 String inputLine;
 
-                while ((inputLine = in.readLine()) != null ) {
+                while ((inputLine = in.readLine()) != null) {
                     //            Funcs.log("netHandler.sendPostIN:", ""+inputLine);
                     //            x = inputLine.indexOf("<!DOCTYPE html>");
                     //            if(x>=0)
@@ -95,21 +111,78 @@ public abstract class Modem {
                 }
             }
             return response.toString();
-        }else
+        } else {
             return null;
+        }
 
-        
+    }
+
+    public BufferedReader request_getContent(String url, LinkedHashMap<String, String> params, boolean isPost,
+            HashMap<String, String> prop) throws MalformedURLException, IOException {
+
+        if (!isPost && params != null) {
+            url = url + "?" + getQuery(params);
+        }
+        URL obj = new URL(url);
+        HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+        con.setRequestProperty("Accept", "application/json");
+        con.setRequestProperty("Accept-Language", "fa,en;q=0.5");
+        con.setRequestProperty("Accept-Charset", "UTF-8");
+
+        if (prop != null) {
+            prop.entrySet().stream().forEach((entrySet) -> {
+                con.setRequestProperty(
+                        entrySet.getKey(),
+                        entrySet.getValue()
+                );
+            });
+        }
+
+        if (cookie != null) {
+            con.setRequestProperty("Cookie", cookie);
+        }
+
+        if (isPost && params != null) {
+            con.setRequestMethod("POST");
+            con.setDoOutput(true);
+            try (DataOutputStream wr = new DataOutputStream(con.getOutputStream())) {
+                wr.writeBytes(getQuery(params));
+                wr.flush();
+            }
+        }
+        int responseCode = -1;
+        try {
+            responseCode = con.getResponseCode();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        System.out.println("responseCode: " + responseCode);
+        StringBuilder response = new StringBuilder();
+        if (responseCode == 200) {
+            String temp = con.getHeaderField("Set-Cookie");
+            if (temp != null) {
+                this.cookie = temp;
+            }
+            try {
+                return new BufferedReader(new InputStreamReader(con.getInputStream()));
+            } catch (Exception e) {
+                e.printStackTrace();
+                return null;
+            }
+        }
+        return null;
     }
 
     private String getQuery(LinkedHashMap<String, String> params) {
         StringBuilder result = new StringBuilder();
         boolean first = true;
 
-        for (Map.Entry<String, String> pair : params.entrySet()){
-            if (first)
+        for (Map.Entry<String, String> pair : params.entrySet()) {
+            if (first) {
                 first = false;
-            else
+            } else {
                 result.append("&");
+            }
 
             result.append(pair.getKey());
             result.append("=");

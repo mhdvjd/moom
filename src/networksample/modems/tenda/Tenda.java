@@ -62,4 +62,9 @@ public class Tenda extends Modem {
         return false;
     }
 
+    @Override
+    public wifiInfo getWifi() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
 }

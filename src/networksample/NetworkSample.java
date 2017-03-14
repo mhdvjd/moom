@@ -25,6 +25,7 @@ public class NetworkSample {
 
     enum modemFunctions {
         login,
+        getWifi,
         setWifi,
         logout,
     }
@@ -69,6 +70,7 @@ public class NetworkSample {
             System.out.println("\n\n=======================================================\n"
                     + "Please Select Function: \n"
                     + modemFunctions.login.ordinal() + ":" + modemFunctions.login + "\n"
+                    + modemFunctions.getWifi.ordinal() + ":" + modemFunctions.getWifi + "\n"
                     + modemFunctions.setWifi.ordinal() + ":" + modemFunctions.setWifi + "\n"
                     + modemFunctions.logout.ordinal() + ":" + modemFunctions.logout);
             String userFunction = System.console().readLine();
@@ -98,9 +100,21 @@ public class NetworkSample {
                         System.out.println("login failed :)");
                     }
                     break;
+                case getWifi:
+                    String g_ssid = "",
+                     g_pass = "";
+                    boolean g_enable = false;
+                    Modem.wifiPassType g_type = null;
+                    Modem.wifiInfo wifiInfo1 = modem.getWifi();
+                    System.out.println(
+                            "ssid=" + wifiInfo1.ssid
+                            + "\tpass=" + wifiInfo1.pass
+                            + "\twifiDisabled=" + wifiInfo1.wifiDisabled
+                            + "\tEncryption=" + wifiInfo1.type);
+                    break;
                 case setWifi:
                     System.out.println("\nPlease Enter \"SSID PASS ENABLE TYPE\"");
-                    
+
                     input = System.console().readLine();
                     tokenizer = new StringTokenizer(input, " ");
                     i = 0;
@@ -109,7 +123,7 @@ public class NetworkSample {
                     boolean enable = true;
                     Modem.wifiPassType type = Modem.wifiPassType.WPA2_TKIP; // default value
                     String tmp;
-                    
+
                     while (tokenizer.hasMoreElements()) {
                         switch (i) {
                             case 0:
