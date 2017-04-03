@@ -2,30 +2,29 @@
  * This is ModemYar project developed by MV_MRP.
  * Copyright (c) 2017. All rights reserved.
  */
-package networksample.modems.tplink;
+package networksample.modems.ip_link;
 
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.LinkedHashMap;
 import networksample.modems.Modem;
 import networksample.modems.WifiStatus;
-import util.Md5;
 
 /**
  *
  * @author mv
  */
-public class TpLink extends Modem{
+public class IpLink extends Modem{
 
     String login = "http://192.168.1.1/";
     
     @Override
     public boolean login(String user, String pass) {
         LinkedHashMap<String, String> params = new LinkedHashMap<>();
-        params.put("Authorization", "Basic "+
-                Base64.getEncoder().encodeToString((user+":"+pass).getBytes()));
+        params.put("username", user);
+        params.put("password", pass);
+        params.put("submit.htm%3Flogin.htm", "Send");
         try{
-            String ans = generalRequest(login, params, true, null);
+            String ans = generalRequest(login+"login.cgi", params, true, null);
             System.out.println(ans);
             
             return ans.contains("index");
@@ -83,6 +82,5 @@ public class TpLink extends Modem{
     @Override
     public InternetConfig getInternetSetting() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-    
+    }    
 }

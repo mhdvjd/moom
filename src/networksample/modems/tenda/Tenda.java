@@ -1,12 +1,13 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * This is ModemYar project developed by MV_MRP.
+ * Copyright (c) 2017. All rights reserved.
  */
 package networksample.modems.tenda;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import networksample.modems.Modem;
+import networksample.modems.WifiStatus;
 import static util.Md5.md5;
 
 /**
@@ -24,7 +25,7 @@ public class Tenda extends Modem{
         params.put("password", md5(pass));
         params.put("sessionKey", "0.1");
         try{
-            String ans = request(login+"login.cgi", params, true, null);
+            String ans = generalRequest(login+"login.cgi", params, true, null);
             System.out.println(ans);
             
             return ans.contains("index");
@@ -35,7 +36,7 @@ public class Tenda extends Modem{
     }
 
     @Override
-    public boolean setWifi(String name, String pass) {
+    public boolean changeWifiConfig(String name, String pass, WifiStatus status) {
         LinkedHashMap<String,String> map = new LinkedHashMap<>();
         map.put("action","add");
         map.put("linkType","DSL");
@@ -51,7 +52,7 @@ public class Tenda extends Modem{
         map.put("wlWpaPsk", pass);
 //                wlWpaPsk=22m%40sh%40d52&
         try{
-            String ans = request(login+"quicksetup.cmd", map, false, null);
+            String ans = generalRequest(login+"quicksetup.cmd", map, false, null);
             System.out.println(ans);
             
             return ans.contains("index");
@@ -59,6 +60,31 @@ public class Tenda extends Modem{
             e.printStackTrace();
         }
         return false;
+    }
+
+    @Override
+    public boolean changeLogin(String oldPass, String newUser, String newPass) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public ArrayList<ConnectedDevice> getDeviceList() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public WifiConfig getWifiConfig() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public boolean changeInternetSetting(String username, String password) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public InternetConfig getInternetSetting() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     
 }

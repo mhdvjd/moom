@@ -1,7 +1,6 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * This is ModemYar project developed by MV_MRP.
+ * Copyright (c) 2017. All rights reserved.
  */
 package networksample.modems;
 
@@ -12,6 +11,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -22,14 +22,24 @@ import java.util.Map;
  */
 public abstract class Modem {
 
-    String cookie = null;
+    private String cookie = null;
     
     
     public abstract boolean login(String user, String pass);
-    public abstract boolean setWifi(String name, String pass);
+    public abstract boolean changeLogin(String oldPass, String newUser, String newPass);
+    
+    public abstract ArrayList<ConnectedDevice> getDeviceList();
+    
+    public abstract boolean changeWifiConfig(String name, String pass, WifiStatus status);
+    public abstract WifiConfig getWifiConfig();
+    
+    public abstract boolean changeInternetSetting(String username, String password);
+    public abstract InternetConfig getInternetSetting();
+
     
     
-    public String request(String url, LinkedHashMap<String, String> params, boolean isPost, 
+    
+    public String generalRequest(String url, LinkedHashMap<String, String> params, boolean isPost, 
             HashMap<String, String> prop)throws MalformedURLException, IOException {
         
         if(!isPost && params!=null)
@@ -61,6 +71,9 @@ public abstract class Modem {
                 wr.flush();
             }
         }
+        
+        
+        
         int responseCode=200;
         try {
             responseCode = con.getResponseCode();
@@ -88,8 +101,6 @@ public abstract class Modem {
             return response.toString(); 
         }else
             return null;
-
-        
     }
     
     private String getQuery(LinkedHashMap<String, String> params) {
@@ -111,5 +122,86 @@ public abstract class Modem {
         }
 
         return result.toString();
+    }
+
+    
+    
+    
+    public static class ConnectedDevice {
+        private final String name;
+        private final String ip;
+        private final String mac;
+        public ConnectedDevice(String name, String ip, String mac) {
+            this.name = name;
+            this.ip = ip;
+            this.mac = mac;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public String getIp() {
+            return ip;
+        }
+
+        public String getMac() {
+            return mac;
+        }
+    }
+
+    public static class InternetConfig {
+        private final String username;
+        private final String password;
+        private final int vci;
+        private final int vpi;
+        
+        public InternetConfig(String username, String password, int vci, int vpi) {
+            this.username = username;
+            this.password = password;
+            this.vci = vci;
+            this.vpi = vpi;
+        }
+
+        public String getUsername() {
+            return username;
+        }
+
+        public String getPassword() {
+            return password;
+        }
+
+        public int getVci() {
+            return vci;
+        }
+
+        public int getVpi() {
+            return vpi;
+        }
+    }
+
+    public static class WifiConfig {
+        private final String name;
+        private final String pass;
+        private final WifiStatus status;
+
+        public WifiConfig(String name, String pass, WifiStatus status) {
+            this.name = name;
+            this.pass = pass;
+            this.status = status;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public String getPass() {
+            return pass;
+        }
+
+        public WifiStatus getStatus() {
+            return status;
+        }
+        
     }
 }

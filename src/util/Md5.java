@@ -1,17 +1,21 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * This is ModemYar project developed by MV_MRP.
+ * Copyright (c) 2017. All rights reserved.
  */
 package util;
 
 import java.security.MessageDigest;
+import java.util.Base64;
 
 /**
  *
  * @author mv
  */
 public class Md5 {
+    public static final String basicAuthorization(String user, String pass) {
+        return Base64.getEncoder().encodeToString((user+":"+pass).getBytes());
+    }
+    
     public static final String md5(final String s) {
         final String MD5 = "MD5";
         try {
